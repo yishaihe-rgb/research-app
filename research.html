@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>סופר שעות – מחקר ולימוד</title>
+  <style>
+    :root { font-family: -apple-system, system-ui, Arial; }
+    body { margin: 0; background:#f6f7f9; color:#111; }
+    .wrap { max-width: 900px; margin: 0 auto; padding: 16px; }
+    .card { background:#fff; border:1px solid #e6e8ee; border-radius: 16px; padding: 14px; margin: 12px 0; box-shadow: 0 2px 10px rgba(0,0,0,.03); }
+    h1 { margin: 8px 0 0; font-size: 22px; }
+    .sub { margin: 6px 0 0; color:#555; font-size: 13px; }
+    .grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+    @media (min-width: 720px) { .grid { grid-template-columns: 1fr 1fr; } }
+    label { display:block; font-size: 13px; color:#333; margin-bottom: 6px; }
+    input, select, button { width: 100%; padding: 12px; border-radius: 12px; border:1px solid #d8dbe3; font-size: 16px; background:#fff; }
+    input[type="datetime-local"]{ direction:ltr; text-align:right; }
+    button { border: none; background:#111; color:#fff; cursor:pointer; }
+    button.secondary { background:#e9ecf3; color:#111; border:1px solid #d8dbe3; }
+    button.danger { background:#b00020; }
+    .row { display:flex; gap:10px; flex-wrap: wrap; }
+    .row > * { flex: 1; min-width: 180px; }
+    .totals { display:grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .pill { background:#f1f3f7; border:1px solid #e6e8ee; border-radius: 14px; padding: 12px; }
+    .big { font-size: 22px; font-weight: 700; margin-top: 4px; direction:ltr; text-align:right; }
+    .small { color:#666; font-size: 12px; margin-top: 2px; }
+    table { width:100%; border-collapse: collapse; }
+    th, td { border-bottom:1px solid #eef0f5; padding: 10px 6px; font-size: 14px; }
+    th { text-align: right; color:#444; font-weight:600; }
+    td.actions { width: 90px; text-align: left; direction:ltr; }
+    .link { background:transparent; color:#111; border:1px solid #d8dbe3; padding: 8px 10px; border-radius: 10px; cursor:pointer; font-size: 13px; }
+    .muted { color:#777; }
+    .hint { font-size: 12px; color:#666; margin-top: 8px; }
+    .footer { margin-top: 10px; font-size: 12px; color:#666; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>סופר שעות – מחקר ולימוד</h1>
+      <div class="sub" id="weekLabel"></div>
+    </div>
+ 
+    <div class="grid">
+      <div class="card">
+        <h2 style="margin:0 0 10px;font-size:18px;">הוספת ישיבה</h2>
+ 
+        <div class="row">
+          <div>
+            <label>סוג</label>
+            <select id="type">
+              <option value="research">מחקר</option>
+              <option value="study">לימוד</option>
+            </select>
+          </div>
+ 
+          <div>
+            <label>דקות</label>
+            <input id="minutes" type="number" min="1" step="1" placeholder="למשל 45" />
+          </div>
+ 
+          <div>
+            <label>תאריך ושעה</label>
+            <input id="when" type="datetime-local" />
+          </div>
+        </div>
+ 
+        <div class="row" style="margin-top:10px;">
+          <button id="addBtn">הוסף</button>
+          <button class="secondary" id="add30">+30 דק׳</button>
+          <button class="secondary" id="add45">+45 דק׳</button>
+          <button class="secondary" id="add60">+60 דק׳</button>
+        </div>
+ 
+        <div class="hint">טיפ: הכי קל ללחוץ +45 או +60 ואז “הוסף”.</div>
+      </div>
+ 
+      <div class="card">
+        <h2 style="margin:0 0 10px;font-size:18px;">סיכום שבועי</h2>
+        <div class="totals">
+          <div class="pill">
+            <div>מחקר</div>
+            <div class="big" id="researchTotal">0:00</div>
+            <div class="small" id="researchSessions">0 ישיבות</div>
+          </div>
+          <div class="pill">
+            <div>לימוד</div>
+            <div class="big" id="studyTotal">0:00</div>
+            <div class="small" id="studySessions">0 ישיבות</div>
+          </div>
+        </div>
+ 
+        <div class="pill" style="margin-top:10px;">
+          <div>סה״כ שבועי</div>
+          <div class="big" id="allTotal">0:00</div>
+          <div class="small muted">מחקר + לימוד</div>
+        </div>
+ 
+        <div class="row" style="margin-top:12px;">
+          <button class="secondary" id="exportBtn">ייצוא CSV</button>
+          <button class="danger" id="clearWeekBtn">איפוס שבוע</button>
+        </div>
+        <div class="footer">הנתונים נשמרים על המכשיר בלבד (לא בענן).</div>
+      </div>
+    </div>
+ 
+    <div class="card">
+      <h2 style="margin:0 0 10px;font-size:18px;">יומן ישיבות (השבוע)</h2>
+      <div id="emptyState" class="muted" style="padding:8px 0;">אין ישיבות עדיין.</div>
+      <div style="overflow:auto;">
+        <table id="table" style="display:none;">
+          <thead>
+            <tr>
+              <th>תאריך</th>
+              <th>סוג</th>
+              <th>משך</th>
+              <th class="actions">פע
